@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full w-full overflow-hidden">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Shree Ganesha Memory & Observation Quest</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            100: '#FFF9E6',
+                            200: '#FFE699',
+                            300: '#FFD700',
+                            400: '#F59E0B',
+                            500: '#D97706',
+                            600: '#B45309',
+                            700: '#92400E'
+                        },
+                        saffron: {
+                            400: '#FF9933',
+                            500: '#FF7700',
+                            600: '#E65C00'
+                        },
+                        maroon: {
+                            800: '#4A0E17',
+                            900: '#2D080E',
+                            950: '#1A0408'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Cinzel', 'Georgia', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts for Divine Aesthetics -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="h-full w-full bg-slate-950 text-slate-100 font-sans select-none overflow-hidden">
+
+    <!-- Fullscreen Ganesha Background -->
+    <div id="bgWrapper" class="fixed inset-0 z-0">
+        <div id="bgImage"
+            class="absolute inset-0 bg-cover bg-center sm:bg-right no-repeat transition-transform duration-700"
+            style="background-image: url('https://files.catbox.moe/jqxd7h.jpg');"></div>
+        <!-- Ethereal Dark Gradients for Crisp Readability -->
+        <div class="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/75 to-slate-950/40"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/50"></div>
+    </div>
+
+    <!-- Festive Canvas Particles & Confetti -->
+    <canvas id="particlesCanvas" class="fixed inset-0 pointer-events-none z-10"></canvas>
+    <canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+    <!-- MAIN SLIDING VIEWPORT CONTAINER (4 Windows: 0=Welcome, 1=Registration, 2=Game, 3=Leaderboard) -->
+    <div id="viewportSlider" class="relative z-20 flex w-[400vw] h-full transition-transform duration-500 ease-in-out">
+
+        <!-- ========================================== -->
+        <!-- SCREEN 0: WELCOME SCREEN (GLASS UI SPEECH) -->
+        <!-- ========================================== -->
+        <section class="w-[100vw] h-full flex flex-col justify-between p-4 sm:p-8 overflow-y-auto">
+
+            <!-- Top Header Navigation -->
+            <header
+                class="w-full max-w-6xl mx-auto flex items-center justify-between gap-4 py-3 px-5 rounded-2xl glass-card z-30">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 rounded-full bg-gradient-to-tr from-saffron-500 to-gold-400 p-[2px] shadow-lg shadow-saffron-500/30 flex items-center justify-center">
+                        <div class="w-full h-full rounded-full bg-maroon-900 flex items-center justify-center text-xl">
+                            🕉️</div>
+                    </div>
+                    <div>
+                        <h1 class="font-serif text-lg sm:text-xl font-bold text-gold-shimmer-text leading-none">Ganesh
+                            Chaturthi</h1>
+                        <p class="text-[10px] text-amber-200/70 tracking-widest uppercase font-medium">Memory & Wisdom
+                            Quest</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button id="soundToggleBtn" onclick="gameApp.toggleAudio()"
+                        class="p-2 sm:px-3 sm:py-2 rounded-xl glass-card hover:border-gold-400/60 text-amber-300 flex items-center gap-2 text-xs sm:text-sm font-semibold">
+                        <span id="soundIcon">🔔</span> <span class="hidden sm:inline" id="soundText">Sound ON</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Welcome Glass Card Overlay -->
+            <div
+                class="w-full max-w-2xl mx-auto my-auto glass-panel rounded-3xl p-6 sm:p-10 space-y-6 relative overflow-hidden border-2 border-gold-500/30 shadow-2xl">
+
+                <div
+                    class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-saffron-500/15 border border-saffron-500/40 text-saffron-300 text-xs font-bold uppercase tracking-wider">
+                    <span>✨ Festive Edition 2026</span>
+                </div>
+
+                <div class="space-y-2">
+                    <h2
+                        class="font-serif text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gold-shimmer-text leading-tight">
+                        Shree Ganesha's Sacred Quest
+                    </h2>
+                    <p class="text-xs sm:text-sm text-amber-200/90 font-medium">
+                        Welcome, Seeker of Wisdom & Joy!
+                    </p>
+                </div>
+
+                <!-- Glass UI Welcome Speech -->
+                <div
+                    class="p-4 sm:p-5 rounded-2xl bg-slate-950/60 border border-gold-500/20 text-xs sm:text-sm leading-relaxed text-slate-200 space-y-3">
+                    <p>
+                        "Om Gam Ganapataye Namaha! Embark on a holy journey to celebrate Lord Ganesha's festival. Test
+                        your visual observation, match sacred offerings (Modak, Durva, Diya), and unlock divine wisdom
+                        snippets!"
+                    </p>
+                    <p class="text-amber-300/90 font-serif italic text-xs">
+                        "May Bappa grant sharp focus, prosperity, and joy to all players!"
+                    </p>
+                </div>
+
+                <!-- Action Button Cluster -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                    <button onclick="gameApp.slideTo(1)"
+                        class="py-4 px-6 rounded-2xl bg-gradient-to-r from-saffron-500 via-gold-400 to-saffron-600 hover:from-saffron-400 hover:to-gold-300 text-maroon-950 font-serif font-black text-lg tracking-wider uppercase shadow-xl shadow-saffron-500/30 hover:shadow-gold-400/50 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group">
+                        <span>✨ START QUEST</span>
+                        <span class="text-xl group-hover:translate-x-1 transition-transform">➡️</span>
+                    </button>
+
+                    <button onclick="gameApp.openLeaderboardScreen()"
+                        class="py-4 px-6 rounded-2xl glass-card hover:border-gold-400 text-gold-300 font-serif font-bold text-base tracking-wide uppercase transition hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2">
+                        <span>🏆 LEADERBOARD</span>
+                    </button>
+                </div>
+
+            </div>
+
+            <footer class="text-center text-xs text-amber-200/50 py-2">
+                🕉️ Created for Ganesh Chaturthi Celebration • May wisdom prevail
+            </footer>
+        </section>
+
+        <!-- ======================================================= -->
+        <!-- SCREEN 1: PLAYER SETUP & GAME MODE SELECTION (SLIDE 1)  -->
+        <!-- ======================================================= -->
+        <section class="w-[100vw] h-full flex flex-col justify-between p-4 sm:p-8 overflow-y-auto">
+            <header class="w-full max-w-5xl mx-auto flex items-center justify-between py-2">
+                <button onclick="gameApp.slideTo(0)"
+                    class="px-4 py-2 rounded-xl glass-card text-amber-300 font-bold text-xs flex items-center gap-2">
+                    ⬅️ Back to Welcome
+                </button>
+                <h2 class="font-serif font-bold text-lg text-gold-400">Player Setup</h2>
+            </header>
+
+            <div
+                class="w-full max-w-xl mx-auto my-auto glass-panel rounded-3xl p-6 sm:p-8 space-y-6 border border-gold-500/30">
+                <div class="text-center space-y-1">
+                    <h3 class="font-serif text-2xl font-extrabold text-gold-shimmer-text">Enter Seeker Details</h3>
+                    <p class="text-xs text-amber-200/70">Required for accurate leaderboard tracking</p>
+                </div>
+
+                <!-- Player Details Form -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs uppercase font-bold text-amber-300 mb-1">Player Name</label>
+                        <input type="text" id="playerNameInput" placeholder="Enter your name (e.g. Aarav)"
+                            class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-gold-500/30 text-gold-200 placeholder-slate-500 focus:outline-none focus:border-gold-400 transition font-medium text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs uppercase font-bold text-amber-300 mb-1">Combination / Unique
+                            ID</label>
+                        <input type="text" id="playerComboInput"
+                            placeholder="Enter Combination ID (e.g. Aarav#108 or Phone/Class)"
+                            class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-gold-500/30 text-gold-200 placeholder-slate-500 focus:outline-none focus:border-gold-400 transition font-medium text-sm">
+                        <p class="text-[10px] text-amber-200/50 mt-1">Combined with your name to distinguish score
+                            entries on the leaderboard.</p>
+                    </div>
+                </div>
+
+                <!-- Game Mode Selector -->
+                <div class="space-y-2">
+                    <label class="block text-xs uppercase font-bold text-amber-300">Choose Quest Mode</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div id="setupModeMatch" onclick="gameApp.selectSetupMode('match')"
+                            class="glass-card active p-4 rounded-2xl cursor-pointer flex flex-col justify-between gap-2">
+                            <span class="text-3xl">🃏</span>
+                            <div>
+                                <h4 class="font-serif font-bold text-sm text-gold-200">Sacred Card Match</h4>
+                                <p class="text-[11px] text-slate-300/70 mt-0.5">Flip face-down cards to discover pairs &
+                                    festival lore.</p>
+                            </div>
+                        </div>
+
+                        <div id="setupModeObs" onclick="gameApp.selectSetupMode('observation')"
+                            class="glass-card p-4 rounded-2xl cursor-pointer flex flex-col justify-between gap-2">
+                            <span class="text-3xl">👁️</span>
+                            <div>
+                                <h4 class="font-serif font-bold text-sm text-gold-200">Observation Quest</h4>
+                                <p class="text-[11px] text-slate-300/70 mt-0.5">Memorize scene items and answer quantity
+                                    quizzes.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button onclick="gameApp.confirmPlayerAndStart()"
+                    class="w-full py-4 rounded-2xl bg-gradient-to-r from-saffron-500 to-gold-400 text-maroon-950 font-serif font-black text-base uppercase tracking-wider shadow-lg hover:opacity-95 transition">
+                    🚀 Launch Game
+                </button>
+            </div>
+
+            <div></div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- SCREEN 2: GAMEPLAY ARENA & HUD (SLIDE 2)       -->
+        <!-- ============================================== -->
+        <section class="w-[100vw] h-full flex flex-col justify-between p-3 sm:p-6 overflow-y-auto">
+
+            <!-- Game HUD -->
+            <header
+                class="w-full max-w-5xl mx-auto glass-card rounded-2xl p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3 z-30">
+                <div class="flex items-center gap-3">
+                    <button onclick="gameApp.slideTo(0)"
+                        class="px-3 py-1.5 rounded-xl glass-card text-amber-300 font-bold text-xs">
+                        🏠 Exit
+                    </button>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span id="hudPlayerName" class="font-serif font-bold text-sm text-gold-300">Aarav</span>
+                            <span id="hudPlayerCombo"
+                                class="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">#108</span>
+                        </div>
+                        <div id="hudLevelBadge" class="text-[10px] font-bold text-saffron-400 uppercase">Level 1 (4x2
+                            Grid)</div>
+                    </div>
+                </div>
+
+                <!-- Live Gameplay Stats -->
+                <div class="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm font-bold">
+                    <div>
+                        <span class="text-amber-200/60 uppercase text-[10px] block">Lives</span>
+                        <span id="hudLives" class="text-red-400 text-base">❤️ ❤️ ❤️</span>
+                    </div>
+
+                    <div>
+                        <span class="text-amber-200/60 uppercase text-[10px] block">Score</span>
+                        <span id="hudScore" class="font-serif text-gold-400 text-lg">0</span>
+                    </div>
+
+                    <div>
+                        <span class="text-amber-200/60 uppercase text-[10px] block">Combo</span>
+                        <span id="hudCombo" class="text-saffron-400 text-base">🔥 1x</span>
+                    </div>
+
+                    <div>
+                        <span class="text-amber-200/60 uppercase text-[10px] block">Time</span>
+                        <span id="hudTimer" class="font-mono text-amber-200 text-base">00:45</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Gameplay Container Area -->
+            <main class="w-full max-w-5xl mx-auto my-auto py-3">
+
+                <!-- CARD MATCH GAME BOARD -->
+                <div id="matchBoardContainer" class="flex flex-col gap-4">
+                    <div id="matchGrid"
+                        class="grid gap-3 max-w-3xl mx-auto w-full p-4 rounded-2xl bg-slate-950/70 border border-gold-500/20">
+                        <!-- Dynamic Cards Rendered Here -->
+                    </div>
+                </div>
+
+                <!-- OBSERVATION QUEST BOARD -->
+                <div id="obsBoardContainer" class="hidden flex-col gap-4 text-center">
+                    <div id="obsHeader" class="space-y-1">
+                        <h3 id="obsPhaseTitle" class="font-serif text-xl font-bold text-gold-300">Memorize the Divine
+                            Items!</h3>
+                        <p id="obsPhaseDesc" class="text-xs text-amber-200/70">Remember what you see before time runs
+                            out!</p>
+                        <div
+                            class="w-full max-w-md mx-auto bg-slate-900 rounded-full h-2 mt-2 overflow-hidden border border-gold-500/30">
+                            <div id="obsProgressBar"
+                                class="bg-gradient-to-r from-saffron-500 to-gold-400 h-full w-full transition-all duration-1000 linear">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="obsGrid"
+                        class="grid grid-cols-4 gap-3 max-w-2xl mx-auto w-full p-4 rounded-2xl bg-slate-950/70 border border-gold-500/20">
+                        <!-- Observation items dynamically rendered -->
+                    </div>
+
+                    <!-- Observation Quiz Box -->
+                    <div id="obsQuizStage"
+                        class="hidden max-w-lg mx-auto w-full glass-card p-6 rounded-2xl flex-col gap-4">
+                        <span class="text-4xl mx-auto">❓</span>
+                        <h4 id="quizQuestionText" class="font-serif text-base font-bold text-gold-200">How many Modaks
+                            were visible?</h4>
+                        <div id="quizOptionsGrid" class="grid grid-cols-2 gap-3 pt-2"></div>
+                    </div>
+                </div>
+
+            </main>
+
+            <!-- Educational Lore Snippet Banner -->
+            <div id="educationalLoreBanner"
+                class="hidden w-full max-w-2xl mx-auto p-3 rounded-xl bg-gradient-to-r from-saffron-900/90 to-maroon-900/90 border border-gold-400/40 text-xs text-amber-100 flex items-center gap-3 animate-pulse">
+                <span class="text-2xl" id="loreSymbol">🍬</span>
+                <div>
+                    <span class="font-serif font-bold text-gold-300 block" id="loreTitle">Divine Association</span>
+                    <span id="loreText" class="text-[11px] leading-snug">Modak is Lord Ganesha's favorite sweet
+                        offering!</span>
+                </div>
+            </div>
+
+            <div></div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- SCREEN 3: LEADERBOARD (SLIDE 3)                 -->
+        <!-- ============================================== -->
+        <section class="w-[100vw] h-full flex flex-col justify-between p-4 sm:p-8 overflow-y-auto">
+            <header class="w-full max-w-5xl mx-auto flex items-center justify-between py-2">
+                <button onclick="gameApp.slideTo(0)"
+                    class="px-4 py-2 rounded-xl glass-card text-amber-300 font-bold text-xs flex items-center gap-2">
+                    🏠 Home
+                </button>
+                <h2 class="font-serif font-bold text-xl text-gold-shimmer-text">Hall of Wisdom & Trophies</h2>
+            </header>
+
+            <div
+                class="w-full max-w-4xl mx-auto my-auto glass-panel rounded-3xl p-4 sm:p-8 space-y-4 border border-gold-500/30">
+                <div
+                    class="flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-gold-500/20 pb-4">
+                    <div>
+                        <h3 class="font-serif text-lg font-bold text-gold-300">Top Seekers Scoreboard</h3>
+                        <p class="text-xs text-amber-200/60">Track the seekers who reached the highest scores</p>
+                    </div>
+
+                    <div class="flex items-center gap-2 text-xs">
+                        <button onclick="gameApp.loadLeaderboardData('all')"
+                            class="px-3 py-1.5 rounded-lg glass-card text-gold-300 font-bold">All Scores</button>
+                    </div>
+                </div>
+
+                <!-- Leaderboard Table -->
+                <div class="overflow-x-auto max-h-[50vh]">
+                    <table class="w-full text-left text-xs sm:text-sm">
+                        <thead
+                            class="bg-slate-950/80 text-gold-400 font-serif uppercase tracking-wider text-[11px] sticky top-0">
+                            <tr>
+                                <th class="p-3">Rank</th>
+                                <th class="p-3">Seeker Name</th>
+                                <th class="p-3">Combo ID</th>
+                                <th class="p-3">Score</th>
+                                <th class="p-3">Level</th>
+                                <th class="p-3">Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardTbody" class="divide-y divide-gold-500/10 text-slate-200 font-medium">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <footer class="text-center text-xs text-amber-200/50 py-2">
+                Shree Ganesha Leaderboard • Updated in Real Time
+            </footer>
+        </section>
+
+    </div>
+
+    <!-- VICTORY & GAME OVER MODAL -->
+    <div id="victoryModal"
+        class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+        <div
+            class="w-full max-w-md glass-panel p-6 sm:p-8 rounded-3xl text-center space-y-5 border border-gold-500/50 relative shadow-2xl">
+            <div
+                class="w-20 h-20 rounded-full bg-gradient-to-tr from-saffron-500 to-gold-400 p-[3px] mx-auto shadow-lg shadow-saffron-500/50">
+                <div class="w-full h-full rounded-full bg-maroon-900 flex items-center justify-center text-4xl">🎉</div>
+            </div>
+
+            <div class="space-y-1">
+                <h3 id="victoryTitle" class="font-serif text-2xl font-extrabold text-gold-shimmer-text">Blessings
+                    Received!</h3>
+                <p id="victorySubtitle" class="text-xs text-amber-100/80">You completed the level with excellence!</p>
+            </div>
+
+            <div
+                class="p-4 rounded-2xl bg-slate-950/70 border border-gold-500/20 grid grid-cols-2 gap-3 text-left text-xs">
+                <div>
+                    <span class="text-amber-200/60 uppercase text-[10px]">Final Score</span>
+                    <div id="vicFinalScore" class="font-serif text-xl font-bold text-gold-400">1,250</div>
+                </div>
+                <div>
+                    <span class="text-amber-200/60 uppercase text-[10px]">Level Reached</span>
+                    <div id="vicLevel" class="font-serif text-xl font-bold text-saffron-400">Level 1</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <button onclick="gameApp.nextLevelOrRestart()" id="vicNextBtn"
+                    class="w-full py-3.5 rounded-xl bg-gradient-to-r from-saffron-500 to-gold-400 text-maroon-950 font-serif font-black uppercase text-xs tracking-wider shadow-lg">
+                    Next Level ➡️
+                </button>
+                <button onclick="gameApp.openLeaderboardScreen()"
+                    class="w-full py-3 rounded-xl glass-card text-gold-300 font-bold uppercase text-xs">
+                    View Leaderboard 🏆
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script src="game.js"></script>
+</body>
+
+</html>
