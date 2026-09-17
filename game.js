@@ -212,6 +212,79 @@ const FESTIVAL_ITEMS = [
     { symbol: '🪷', name: 'Lotus', lore: 'Lotus represents purity, divine knowledge, and spiritual enlightenment!' }
 ];
 
+const OBSERVATION_SCENES = [
+    {
+        image: 'Carde/imaage1/imaage.jpeg',
+        questionFile: 'Carde/imaage1/questions.html',
+        questions: [
+            { text: 'What is Ganesha holding in his right hand?', answer: 'An axe', options: ['A conch', 'An axe', 'A book', 'A drum'] },
+            { type: 'text', text: 'Which flower is visible in Ganesha\'s left hand?', answer: 'A lotus' },
+            { text: 'What sweet offering is in the bowl?', answer: 'Modaks', options: ['Laddus', 'Modaks', 'Bananas', 'Coconuts'] },
+            { text: 'What animal is near the lower right side?', answer: 'A mouse', options: ['A peacock', 'A deer', 'A mouse', 'A cow'] }
+        ]
+    },
+    {
+        image: 'Carde/imaage2/imaage.jpeg',
+        questionFile: 'Carde/imaage2/questions.html',
+        questions: [
+            { text: 'Who is seated beside Ganesha in the center?', answer: 'Shiva and Parvati', options: ['Shiva and Parvati', 'Rama and Sita', 'Krishna and Radha', 'Two musicians'] },
+            { type: 'text', text: 'What large animal is near the left side?', answer: 'A cow' },
+            { text: 'What colorful floor design is in the foreground?', answer: 'A rangoli', options: ['A map', 'A rangoli', 'A carpet', 'A pond'] },
+            { text: 'What bird is visible on the right side?', answer: 'A peacock', options: ['A parrot', 'A peacock', 'A swan', 'An eagle'] }
+        ]
+    },
+    {
+        image: 'Carde/imaage3/imaage.jpeg',
+        questionFile: 'Carde/imaage3/questions.html',
+        questions: [
+            { text: 'What is at the center of the temple platform?', answer: 'Ganesha', options: ['Ganesha', 'A cow', 'A peacock', 'A musician'] },
+            { type: 'text', text: 'What animals are hanging from the large tree?', answer: 'Ganesha figures' },
+            { text: 'Which animal is at the bottom left?', answer: 'A cow', options: ['A cow', 'A dog', 'A deer', 'A goat'] },
+            { text: 'What is being sold at the market on the right?', answer: 'Fruits and sweets', options: ['Books and toys', 'Fruits and sweets', 'Clothes only', 'Flowers only'] }
+        ]
+    },
+    {
+        image: 'Carde/imaage4/imaage.jpeg',
+        questionFile: 'Carde/imaage4/questions.html',
+        questions: [
+            { text: 'Which deity is seated beside Ganesha?', answer: 'Shiva', options: ['Vishnu', 'Shiva', 'Brahma', 'Indra'] },
+            { type: 'text', text: 'What is burning in front of the family?', answer: 'A sacred fire' },
+            { text: 'Which birds are perched in the trees?', answer: 'Parrots', options: ['Parrots', 'Peacocks', 'Swans', 'Crows'] },
+            { text: 'What animal is seated on the left side of the scene?', answer: 'A deer', options: ['A deer', 'A cow', 'A horse', 'A monkey'] }
+        ]
+    },
+    {
+        image: 'Carde/imaage5/imaage.jpeg',
+        questionFile: 'Carde/imaage5/questions.html',
+        questions: [
+            { text: 'What is Ganesha seated on?', answer: 'A decorated throne', options: ['A rock', 'A decorated throne', 'A boat', 'A swing'] },
+            { type: 'text', text: 'What hangs from the ceiling of the temple?', answer: 'A bell' },
+            { text: 'What is the cow looking toward?', answer: 'The temple', options: ['The river', 'The temple', 'The mountain', 'The market'] },
+            { text: 'Which colors are visible on the market awnings?', answer: 'Blue and orange', options: ['Blue and orange', 'Pink and white', 'Black and green', 'Purple and silver'] }
+        ]
+    },
+    {
+        image: 'Carde/imaage6/imaage.jpeg',
+        questionFile: 'Carde/imaage6/questions.html',
+        questions: [
+            { text: 'What is Ganesha holding in the center?', answer: 'A sweet', options: ['A sweet', 'A flower', 'A bell', 'A flag'] },
+            { type: 'text', text: 'What is behind the figures in the scene?', answer: 'A waterfall' },
+            { text: 'Which animal appears many times in the trees?', answer: 'A squirrel', options: ['A squirrel', 'A cow', 'A camel', 'A rabbit'] },
+            { text: 'What is in front of the seated figures?', answer: 'A cooking fire', options: ['A cooking fire', 'A fountain', 'A stage', 'A pond'] }
+        ]
+    },
+    {
+        image: 'Carde/imaage7/imaage.jpeg',
+        questionFile: 'Carde/imaage7/questions.html',
+        questions: [
+            { text: 'Who is seated in the center of the first scene?', answer: 'Ganesha', options: ['Ganesha', 'Shiva', 'A priest', 'A child'] },
+            { type: 'text', text: 'What is held in Ganesha\'s lower right hand?', answer: 'A sweet' },
+            { text: 'What is hanging from the top of the scene?', answer: 'Temple bells', options: ['Temple bells', 'Banners', 'Lanterns', 'Fruit'] },
+            { text: 'What is in the large bowl at the bottom?', answer: 'Modaks', options: ['Modaks', 'Rice', 'Flowers', 'Coins'] }
+        ]
+    }
+];
+
 class GaneshaQuestApp {
     constructor() {
         this.currentSlide = 0;
@@ -272,8 +345,14 @@ class GaneshaQuestApp {
         const nameVal = document.getElementById('playerNameInput').value.trim();
         const comboVal = document.getElementById('playerComboInput').value.trim();
 
-        this.playerName = nameVal || 'Seeker Aarav';
-        this.playerCombo = comboVal || 'Aarav#108';
+        if (!nameVal || !comboVal) {
+            document.getElementById('playerNameInput').reportValidity();
+            document.getElementById('playerComboInput').reportValidity();
+            return;
+        }
+
+        this.playerName = nameVal;
+        this.playerCombo = comboVal;
 
         // Update HUD
         document.getElementById('hudPlayerName').textContent = this.playerName;
@@ -421,82 +500,134 @@ class GaneshaQuestApp {
         document.getElementById('matchBoardContainer').classList.add('hidden');
         document.getElementById('obsBoardContainer').classList.remove('hidden');
         document.getElementById('obsBoardContainer').classList.add('flex');
-        document.getElementById('obsQuizStage').classList.add('hidden');
-        document.getElementById('obsGrid').classList.remove('hidden');
-
-        const totalItems = 6 + (this.level * 2);
-        const pool = [...FESTIVAL_ITEMS].sort(() => 0.5 - Math.random()).slice(0, 4);
-
-        this.obsItems = [];
-        for (let i = 0; i < totalItems; i++) {
-            this.obsItems.push(pool[Math.floor(Math.random() * pool.length)]);
-        }
-
-        const grid = document.getElementById('obsGrid');
-        grid.innerHTML = '';
-        this.obsItems.forEach(item => {
-            const cell = document.createElement('div');
-            cell.className = 'h-20 glass-card rounded-xl flex flex-col items-center justify-center p-2 text-center';
-            cell.innerHTML = `<span class="text-3xl">${item.symbol}</span><span class="text-[9px] text-amber-200/70 font-bold mt-1">${item.name}</span>`;
-            grid.appendChild(cell);
-        });
-
-        const obsTime = 6;
-        const bar = document.getElementById('obsProgressBar');
-        bar.style.transitionDuration = '0s';
-        bar.style.width = '100%';
-        setTimeout(() => {
-            bar.style.transitionDuration = obsTime + 's';
-            bar.style.width = '0%';
-        }, 50);
-
-        setTimeout(() => {
-            this.showObsQuiz(pool);
-        }, obsTime * 1000);
-
-        this.startTimer(obsTime + 30);
+        this.obsScenes = [...OBSERVATION_SCENES].sort(() => 0.5 - Math.random());
+        this.obsSceneIndex = 0;
+        this.startTimer(300);
+        this.showNextObservationScene();
     }
 
-    showObsQuiz(pool) {
-        sounds.playBell();
-        document.getElementById('obsGrid').classList.add('hidden');
-        document.getElementById('obsQuizStage').classList.remove('hidden');
-        document.getElementById('obsQuizStage').classList.add('flex');
+    async loadObservationQuestions(scene) {
+        try {
+            const response = await fetch(scene.questionFile, { cache: 'no-store' });
+            if (!response.ok) throw new Error(`Question file returned ${response.status}`);
 
-        const target = pool[Math.floor(Math.random() * pool.length)];
-        const actual = this.obsItems.filter(i => i.symbol === target.symbol).length;
+            const html = await response.text();
+            const documentFromFile = new DOMParser().parseFromString(html, 'text/html');
+            const questionData = JSON.parse(documentFromFile.getElementById('questions').textContent);
+            if (!Array.isArray(questionData) || questionData.length === 0) throw new Error('Question file is empty');
+            return questionData;
+        } catch (error) {
+            console.warn(`Using backup questions for ${scene.image}`, error);
+            return scene.questions;
+        }
+    }
 
-        document.getElementById('quizQuestionText').innerHTML = `How many <span class="text-gold-400 font-bold">${target.name}s</span> (${target.symbol}) were visible?`;
+    async showNextObservationScene() {
+        const scene = this.obsScenes[this.obsSceneIndex];
+        const revealSeconds = 6;
+        const card = document.getElementById('obsMemoryCard');
+        const cardInner = document.getElementById('obsMemoryCardInner');
+        const image = document.getElementById('obsSceneImage');
+        const questions = await this.loadObservationQuestions(scene);
+        const question = questions[Math.floor(Math.random() * questions.length)];
+        const progressBar = document.getElementById('obsProgressBar');
 
-        const options = new Set([actual]);
-        while (options.size < 4) {
-            let fake = actual + (Math.floor(Math.random() * 5) - 2);
-            if (fake >= 0) options.add(fake);
+        card.classList.remove('flipped');
+        cardInner.style.transform = '';
+        image.src = scene.image;
+        document.getElementById('obsSceneCounter').textContent = `Scene ${this.obsSceneIndex + 1} of ${this.obsScenes.length}`;
+        document.getElementById('obsRevealLabel').textContent = 'Memorize this scene';
+        document.getElementById('quizQuestionText').textContent = question.text;
+
+        progressBar.style.transitionDuration = '0s';
+        progressBar.style.width = '100%';
+        setTimeout(() => {
+            progressBar.style.transitionDuration = revealSeconds + 's';
+            progressBar.style.width = '0%';
+        }, 50);
+
+        this.obsQuestionLocked = true;
+        const optionsGrid = document.getElementById('quizOptionsGrid');
+        optionsGrid.innerHTML = '';
+        if (question.type === 'text') {
+            optionsGrid.className = 'flex flex-col gap-3 pt-2';
+            optionsGrid.innerHTML = `
+                <input id="obsTextAnswer" type="text" autocomplete="off"
+                    placeholder="Type your answer"
+                    class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-gold-500/30 text-gold-200 placeholder-slate-500 focus:outline-none focus:border-gold-400 font-medium text-sm">
+                <button id="obsTextSubmit" type="button"
+                    class="py-3 rounded-xl bg-gradient-to-r from-saffron-500 to-gold-400 text-maroon-950 font-bold uppercase tracking-wide">
+                    Submit Answer
+                </button>`;
+            const input = document.getElementById('obsTextAnswer');
+            document.getElementById('obsTextSubmit').onclick = () => {
+                const typedAnswer = input.value.trim();
+                if (!typedAnswer) {
+                    input.focus();
+                    return;
+                }
+                const acceptedAnswers = Array.isArray(question.answer) ? question.answer : [question.answer];
+                const isCorrect = acceptedAnswers.some(answer => typedAnswer.toLowerCase() === answer.trim().toLowerCase());
+                this.answerObservationQuestion(isCorrect, optionsGrid);
+            };
+            input.onkeydown = event => {
+                if (event.key === 'Enter') document.getElementById('obsTextSubmit').click();
+            };
+        } else {
+            optionsGrid.className = 'grid grid-cols-2 gap-3 pt-2';
+            [...question.options].sort(() => 0.5 - Math.random()).forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'py-3 rounded-xl glass-card hover:border-gold-400 text-gold-300 font-bold text-lg';
+                btn.textContent = option;
+                btn.onclick = () => {
+                    this.answerObservationQuestion(option === question.answer, optionsGrid);
+                };
+                optionsGrid.appendChild(btn);
+            });
         }
 
-        const optionsArr = Array.from(options).sort((a, b) => a - b);
-        const grid = document.getElementById('quizOptionsGrid');
-        grid.innerHTML = '';
-        optionsArr.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = 'py-3 rounded-xl glass-card hover:border-gold-400 text-gold-300 font-bold text-lg';
-            btn.textContent = opt;
-            btn.onclick = () => {
-                if (opt === actual) {
-                    sounds.playMatch();
-                    this.score += 500 * this.streak;
-                    this.streak++;
-                    this.handleLevelComplete();
-                } else {
-                    sounds.playWrong();
-                    this.lives--;
-                    this.updateHUD();
-                    if (this.lives <= 0) this.handleGameOver();
-                    else this.startLevel();
-                }
-            };
-            grid.appendChild(btn);
+        clearTimeout(this.obsRevealTimer);
+        this.obsRevealTimer = setTimeout(() => {
+            sounds.playBell();
+            card.classList.add('flipped');
+            document.getElementById('obsRevealLabel').textContent = 'Answer the question';
+            this.obsQuestionLocked = false;
+            this.obsRevealTimer = null;
+        }, revealSeconds * 1000);
+    }
+
+    answerObservationQuestion(isCorrect, optionsGrid) {
+        if (this.obsQuestionLocked) return;
+        this.obsQuestionLocked = true;
+        clearTimeout(this.obsRevealTimer);
+        this.obsRevealTimer = null;
+        [...optionsGrid.querySelectorAll('button')].forEach(button => {
+            button.disabled = true;
+            button.classList.add('opacity-60');
         });
+
+        if (isCorrect) {
+            sounds.playMatch();
+            this.score += 500 * this.streak;
+            this.streak++;
+        } else {
+            sounds.playWrong();
+            this.lives--;
+            this.streak = 1;
+        }
+        this.updateHUD();
+
+        if (this.lives <= 0) {
+            this.handleGameOver();
+            return;
+        }
+
+        this.obsSceneIndex++;
+        if (this.obsSceneIndex >= this.obsScenes.length) {
+            this.handleLevelComplete();
+        } else {
+            setTimeout(() => this.showNextObservationScene(), 500);
+        }
     }
 
     startTimer(seconds) {

@@ -178,14 +178,14 @@
                 <div class="space-y-4">
                     <div>
                         <label class="block text-xs uppercase font-bold text-amber-300 mb-1">Player Name</label>
-                        <input type="text" id="playerNameInput" placeholder="Enter your name (e.g. Aarav)"
+                        <input type="text" id="playerNameInput" required placeholder="Enter your name (e.g. Aarav)"
                             class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-gold-500/30 text-gold-200 placeholder-slate-500 focus:outline-none focus:border-gold-400 transition font-medium text-sm">
                     </div>
 
                     <div>
                         <label class="block text-xs uppercase font-bold text-amber-300 mb-1">Combination / Unique
                             ID</label>
-                        <input type="text" id="playerComboInput"
+                        <input type="text" id="playerComboInput" required
                             placeholder="Enter Combination ID (e.g. Aarav#108 or Phone/Class)"
                             class="w-full px-4 py-3 rounded-xl bg-slate-950/80 border border-gold-500/30 text-gold-200 placeholder-slate-500 focus:outline-none focus:border-gold-400 transition font-medium text-sm">
                         <p class="text-[10px] text-amber-200/50 mt-1">Combined with your name to distinguish score
@@ -197,6 +197,16 @@
                 <div class="space-y-2">
                     <label class="block text-xs uppercase font-bold text-amber-300">Choose Quest Mode</label>
                     <div class="grid grid-cols-2 gap-3">
+                        <div id="setupModeObs" onclick="gameApp.selectSetupMode('observation')"
+                            class="glass-card p-4 rounded-2xl cursor-pointer flex flex-col justify-between gap-2">
+                            <span class="text-3xl">👁️</span>
+                            <div>
+                                <h4 class="font-serif font-bold text-sm text-gold-200">Observation Quest</h4>
+                                <p class="text-[11px] text-slate-300/70 mt-0.5">Study sacred scenes and answer a
+                                    question about each image.</p>
+                            </div>
+                        </div>
+
                         <div id="setupModeMatch" onclick="gameApp.selectSetupMode('match')"
                             class="glass-card active p-4 rounded-2xl cursor-pointer flex flex-col justify-between gap-2">
                             <span class="text-3xl">🃏</span>
@@ -204,16 +214,6 @@
                                 <h4 class="font-serif font-bold text-sm text-gold-200">Sacred Card Match</h4>
                                 <p class="text-[11px] text-slate-300/70 mt-0.5">Flip face-down cards to discover pairs &
                                     festival lore.</p>
-                            </div>
-                        </div>
-
-                        <div id="setupModeObs" onclick="gameApp.selectSetupMode('observation')"
-                            class="glass-card p-4 rounded-2xl cursor-pointer flex flex-col justify-between gap-2">
-                            <span class="text-3xl">👁️</span>
-                            <div>
-                                <h4 class="font-serif font-bold text-sm text-gold-200">Observation Quest</h4>
-                                <p class="text-[11px] text-slate-300/70 mt-0.5">Memorize scene items and answer quantity
-                                    quizzes.</p>
                             </div>
                         </div>
                     </div>
@@ -280,21 +280,13 @@
             <!-- Gameplay Container Area -->
             <main class="w-full max-w-5xl mx-auto my-auto py-3">
 
-                <!-- CARD MATCH GAME BOARD -->
-                <div id="matchBoardContainer" class="flex flex-col gap-4">
-                    <div id="matchGrid"
-                        class="grid gap-3 max-w-3xl mx-auto w-full p-4 rounded-2xl bg-slate-950/70 border border-gold-500/20">
-                        <!-- Dynamic Cards Rendered Here -->
-                    </div>
-                </div>
-
                 <!-- OBSERVATION QUEST BOARD -->
                 <div id="obsBoardContainer" class="hidden flex-col gap-4 text-center">
                     <div id="obsHeader" class="space-y-1">
-                        <h3 id="obsPhaseTitle" class="font-serif text-xl font-bold text-gold-300">Memorize the Divine
-                            Items!</h3>
-                        <p id="obsPhaseDesc" class="text-xs text-amber-200/70">Remember what you see before time runs
-                            out!</p>
+                        <h3 id="obsPhaseTitle" class="font-serif text-xl font-bold text-gold-300">Observe the Divine
+                            Scene</h3>
+                        <p id="obsPhaseDesc" class="text-xs text-amber-200/70">Study the image for 6 seconds, then
+                            answer one question about it.</p>
                         <div
                             class="w-full max-w-md mx-auto bg-slate-900 rounded-full h-2 mt-2 overflow-hidden border border-gold-500/30">
                             <div id="obsProgressBar"
@@ -303,18 +295,32 @@
                         </div>
                     </div>
 
-                    <div id="obsGrid"
-                        class="grid grid-cols-4 gap-3 max-w-2xl mx-auto w-full p-4 rounded-2xl bg-slate-950/70 border border-gold-500/20">
-                        <!-- Observation items dynamically rendered -->
+                    <div id="obsMemoryCard" class="obs-memory-card perspective-1000">
+                        <div id="obsMemoryCardInner" class="obs-memory-card-inner">
+                            <div class="obs-memory-card-face obs-memory-card-front glass-panel">
+                                <img id="obsSceneImage" class="obs-scene-image" alt="Observation scene">
+                                <div class="obs-card-caption">
+                                    <span id="obsSceneCounter">Scene 1 of 7</span>
+                                    <span id="obsRevealLabel">Memorize this scene</span>
+                                </div>
+                            </div>
+                            <div class="obs-memory-card-face obs-memory-card-back glass-panel">
+                                <span class="text-4xl mx-auto">❓</span>
+                                <span class="text-[10px] uppercase tracking-[0.2em] text-amber-300">Scene recalled</span>
+                                <div id="obsQuizStage" class="flex w-full flex-col gap-4">
+                                    <h4 id="quizQuestionText" class="font-serif text-base font-bold text-gold-200">What did you notice?</h4>
+                                    <div id="quizOptionsGrid" class="grid grid-cols-2 gap-3 pt-2"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                </div>
 
-                    <!-- Observation Quiz Box -->
-                    <div id="obsQuizStage"
-                        class="hidden max-w-lg mx-auto w-full glass-card p-6 rounded-2xl flex-col gap-4">
-                        <span class="text-4xl mx-auto">❓</span>
-                        <h4 id="quizQuestionText" class="font-serif text-base font-bold text-gold-200">How many Modaks
-                            were visible?</h4>
-                        <div id="quizOptionsGrid" class="grid grid-cols-2 gap-3 pt-2"></div>
+                <!-- CARD MATCH GAME BOARD -->
+                <div id="matchBoardContainer" class="flex flex-col gap-4">
+                    <div id="matchGrid"
+                        class="grid gap-3 max-w-3xl mx-auto w-full p-4 rounded-2xl bg-slate-950/70 border border-gold-500/20">
+                        <!-- Dynamic Cards Rendered Here -->
                     </div>
                 </div>
 

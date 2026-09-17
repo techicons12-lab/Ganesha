@@ -100,6 +100,79 @@
             transform: rotateY(180deg);
         }
 
+        .obs-memory-card {
+            width: min(100%, 760px);
+            height: clamp(300px, 52vh, 520px);
+            margin: 0 auto;
+        }
+
+        .obs-memory-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .obs-memory-card.flipped .obs-memory-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .obs-memory-card-face {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border-radius: 1.25rem;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .obs-memory-card-front {
+            padding: 0.5rem;
+            background: rgba(8, 4, 14, 0.96);
+            pointer-events: auto;
+        }
+
+        .obs-memory-card-back {
+            transform: rotateY(180deg);
+            padding: clamp(1rem, 4vw, 2rem);
+            background: linear-gradient(145deg, rgba(80, 15, 28, 0.96), rgba(20, 8, 25, 0.98));
+            pointer-events: none;
+        }
+
+        .obs-memory-card.flipped .obs-memory-card-front {
+            pointer-events: none;
+        }
+
+        .obs-memory-card.flipped .obs-memory-card-back {
+            pointer-events: auto;
+        }
+
+        .obs-scene-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 1rem;
+        }
+
+        .obs-card-caption {
+            position: absolute;
+            inset: auto 1rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.65rem 0.85rem;
+            border: 1px solid rgba(255, 215, 0, 0.35);
+            border-radius: 0.75rem;
+            background: rgba(15, 7, 26, 0.78);
+            color: #fff3bf;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
