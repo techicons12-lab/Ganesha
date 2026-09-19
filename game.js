@@ -282,6 +282,16 @@ const OBSERVATION_SCENES = [
             { text: 'What is hanging from the top of the scene?', answer: 'Temple bells', options: ['Temple bells', 'Banners', 'Lanterns', 'Fruit'] },
             { text: 'What is in the large bowl at the bottom?', answer: 'Modaks', options: ['Modaks', 'Rice', 'Flowers', 'Coins'] }
         ]
+    },
+    {
+        image: 'Carde/imaage8/image.jpeg',
+        questionFile: 'Carde/imaage8/questions.html',
+        questions: [
+            { text: 'Who is seated beside Ganesha on the left?', answer: 'Shiva', options: ['Shiva', 'Vishnu', 'Brahma', 'A priest'] },
+            { type: 'text', text: 'What large bird is standing on the right side of the garden?', answer: 'A peacock' },
+            { text: 'What can be seen in the background behind the family?', answer: 'A waterfall', options: ['A waterfall', 'A palace', 'A desert', 'A marketplace'] },
+            { text: 'What fills the foreground pond?', answer: 'Lotus flowers', options: ['Lotus flowers', 'Boats', 'Gold coins', 'Rocks'] }
+        ]
     }
 ];
 
@@ -419,6 +429,7 @@ class GaneshaQuestApp {
         this.matchedPairs = 0;
         this.totalPairs = pairCount;
         this.flippedCards = [];
+        this.lives = 3;
         this.matchPreview = true;
         clearTimeout(this.matchPreviewTimer);
 
@@ -491,7 +502,6 @@ class GaneshaQuestApp {
                     this.matchedPairs++;
                     this.score += 200 * this.streak;
                     this.streak++;
-                    this.lives = 3;
                     this.updateHUD();
                     this.flippedCards = [];
 
