@@ -931,9 +931,19 @@ class GaneshaQuestApp {
                 .from('ganesha_memory_scores')
                 .select('*')
                 .order('score', { ascending: false })
-                .limit(20);
+                .order('level', { ascending: false })
+                .order('time_seconds', { ascending: true });
             if (error) throw error;
-            scores = data || [];
+            this.leaderboardRecords = data || [];
+            const uniquePlayers = new Map();
+            this.leaderboardRecords.forEach(score => {
+                const playerName = (score.player_name || 'Seeker').trim();
+                const playerKey = playerName.toLowerCase();
+                if (!uniquePlayers.has(playerKey)) {
+                    uniquePlayers.set(playerKey, { ...score, player_name: playerName });
+                }
+            });
+            scores = [...uniquePlayers.values()].slice(0, 20);
         } catch (error) {
             console.error('Could not load scores from Supabase', error);
             tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-red-300">Leaderboard unavailable. Please try again.</td></tr>';
@@ -950,15 +960,44 @@ class GaneshaQuestApp {
             const row = document.createElement('tr');
             row.className = idx % 2 === 0 ? 'bg-slate-900/40' : 'bg-slate-950/60';
             row.innerHTML = `
-                        <td class="p-3 font-bold ${idx === 0 ? 'text-gold-400 text-base' : 'text-slate-300'}">#${idx + 1}</td>
-                        <td class="p-3 font-bold text-amber-200">${s.player_name || 'Seeker'}</td>
-                        <td class="p-3"><span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px]">${s.combination_id || '#108'}</span></td>
-                        <td class="p-3 font-serif font-bold text-gold-300">${(s.score || 0).toLocaleString()}</td>
-                        <td class="p-3">Lvl ${s.level || 1}</td>
-                        <td class="p-3 text-slate-400">${s.time_seconds || 0}s</td>
-                    `;
+                <td class="p-3 font-bold ${idx === 0 ? 'text-gold-400 text-base' : 'text-slate-300'}">#${idx + 1}</td>
+                <td class="p-3"></td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px]">${s.combination_id || '#108'}</span></td>
+                <td class="p-3 font-serif font-bold text-gold-300">${(s.score || 0).toLocaleString()}</td>
+                <td class="p-3">Lvl ${s.level || 1}</td>
+                <td class="p-3 text-slate-400">${s.time_seconds || 0}s</td>
+            `;
+            const nameButton = document.createElement('button');
+            nameButton.type = 'button';
+            nameButton.className = 'font-bold text-amber-200 hover:text-gold-300 underline decoration-amber-500/40 underline-offset-4';
+            nameButton.textContent = s.player_name || 'Seeker';
+            nameButton.onclick = () => this.openPlayerRecords(s.player_name || 'Seeker');
+            row.children[1].appendChild(nameButton);
             tbody.appendChild(row);
         });
+    }
+
+    openPlayerRecords(playerName) {
+        const playerKey = playerName.trim().toLowerCase();
+        const records = (this.leaderboardRecords || [])
+            .filter(record => (record.player_name || 'Seeker').trim().toLowerCase() === playerKey)
+            .sort((a, b) => (b.score || 0) - (a.score || 0) || (b.level || 0) - (a.level || 0));
+        const title = document.getElementById('playerRecordsTitle');
+        const body = document.getElementById('playerRecordsTbody');
+        title.textContent = `${playerName} - All Records`;
+        body.innerHTML = '';
+        records.forEach(record => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="p-3">Lvl ${record.level || 1}</td>
+                <td class="p-3 font-serif font-bold text-gold-300">${(record.score || 0).toLocaleString()}</td>
+                <td class="p-3">${record.combination_id || '#108'}</td>
+                <td class="p-3 text-slate-400">${record.time_seconds || 0}s</td>
+                <td class="p-3 text-slate-400">${record.created_at ? new Date(record.created_at).toLocaleDateString() : '-'}</td>
+            `;
+            body.appendChild(row);
+        });
+        this.openModal('playerRecordsModal');
     }
 
     openModal(id) {
