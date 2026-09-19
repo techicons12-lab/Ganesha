@@ -419,6 +419,8 @@ class GaneshaQuestApp {
         this.matchedPairs = 0;
         this.totalPairs = pairCount;
         this.flippedCards = [];
+        this.matchPreview = true;
+        clearTimeout(this.matchPreviewTimer);
 
         const pool = [...FESTIVAL_ITEMS].sort(() => 0.5 - Math.random()).slice(0, pairCount);
         const deck = [...pool, ...pool].sort(() => 0.5 - Math.random());
@@ -454,11 +456,18 @@ class GaneshaQuestApp {
             grid.appendChild(card);
         });
 
-        this.startTimer(pairCount * 8);
+        const cards = [...grid.querySelectorAll('.flip-card')];
+        cards.forEach(card => card.classList.add('flipped'));
+        this.matchPreviewTimer = setTimeout(() => {
+            cards.forEach(card => card.classList.remove('flipped'));
+            this.matchPreview = false;
+            this.matchPreviewTimer = null;
+            this.startTimer(pairCount * 8);
+        }, 3000);
     }
 
     handleCardClick(card, item) {
-        if (this.flippedCards.length >= 2 || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+        if (this.matchPreview || this.flippedCards.length >= 2 || card.classList.contains('flipped') || card.classList.contains('matched')) return;
 
         sounds.playFlip();
         card.classList.add('flipped');
@@ -482,6 +491,7 @@ class GaneshaQuestApp {
                     this.matchedPairs++;
                     this.score += 200 * this.streak;
                     this.streak++;
+                    this.lives = 3;
                     this.updateHUD();
                     this.flippedCards = [];
 
