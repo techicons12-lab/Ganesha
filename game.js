@@ -297,6 +297,8 @@ class GaneshaQuestApp {
         this.lives = 3;
         this.timer = null;
         this.timeLeft = 45;
+        this.obsLoadToken = 0; // guards against stale async scene loads
+        this.obsFsOpening = Promise.resolve(); // resolves when the maximise animation ends
 
         // The leaderboard uses the configured Supabase project only.
         this.supabaseUrl = 'https://bbonclhkcgpjeskovchr.supabase.co';
@@ -322,6 +324,7 @@ class GaneshaQuestApp {
     // Slide Navigation
     slideTo(index) {
         sounds.playFlip();
+        if (index !== 2) this.closeObsFullscreen(false);
         this.currentSlide = index;
         const slider = document.getElementById('viewportSlider');
         slider.style.transform = `translateX(-${index * 100}vw)`;
@@ -383,6 +386,15 @@ class GaneshaQuestApp {
         document.getElementById('hudCombo').textContent = `🔥 ${this.streak}x`;
         document.getElementById('hudLives').textContent = '❤️ '.repeat(Math.max(0, this.lives));
 
+        // Mirror into the full-screen stage HUD
+        const mirror = (id, text) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        };
+        mirror('fsScore', this.score.toLocaleString());
+        mirror('fsCombo', `🔥 ${this.streak}x`);
+        mirror('fsLives', '❤️ '.repeat(Math.max(0, this.lives)));
+
         let levelDesc = `Level ${this.level}`;
         if (this.level === 1) levelDesc += ' (4x2 Grid)';
         else if (this.level === 2) levelDesc += ' (4x3 Grid)';
@@ -396,6 +408,7 @@ class GaneshaQuestApp {
     initMatchLevel() {
         document.getElementById('matchBoardContainer').classList.remove('hidden');
         document.getElementById('obsBoardContainer').classList.add('hidden');
+        this.closeObsFullscreen(false);
 
         // Level configuration pair count
         let pairCount = 4;
@@ -500,10 +513,117 @@ class GaneshaQuestApp {
         document.getElementById('matchBoardContainer').classList.add('hidden');
         document.getElementById('obsBoardContainer').classList.remove('hidden');
         document.getElementById('obsBoardContainer').classList.add('flex');
+
+        // Hide any stale image from a previous run until the new one has loaded
+        const image = document.getElementById('obsSceneImage');
+        image.classList.add('is-loading');
+        image.removeAttribute('src');
+        document.getElementById('obsSceneBackdrop').classList.remove('ready');
+
+        // Open the scene full screen (Mac-style "maximise" animation)
+        this.openObsFullscreen();
+
         this.obsScenes = [...OBSERVATION_SCENES].sort(() => 0.5 - Math.random());
         this.obsSceneIndex = 0;
-        this.startTimer(300);
+
+        // Show the full time but do NOT start counting down yet.
+        // The clock starts only after the first scene image has loaded.
+        this.pauseTimer();
+        this.timeLeft = 300;
+        this.updateTimerDisplay();
+
         this.showNextObservationScene();
+    }
+
+    // ---- Full-screen stage --------------------------------------------
+    openObsFullscreen() {
+        const layer = document.getElementById('obsFullscreen');
+        const frame = document.getElementById('obsFsFrame');
+        document.getElementById('obsMemoryCard').classList.remove('flipped');
+        document.getElementById('obsMemoryCardInner').style.transform = '';
+
+        if (layer.classList.contains('open')) {
+            this.obsFsOpening = Promise.resolve();
+            return;
+        }
+        layer.classList.add('open');
+        layer.setAttribute('aria-hidden', 'false');
+
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reduceMotion || !frame.animate) {
+            this.obsFsOpening = Promise.resolve();
+            return;
+        }
+
+        // Grow from a smaller rounded window to the full screen, like a Mac maximise
+        const opts = { duration: 480, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' };
+        layer.animate(
+            [{ backgroundColor: 'rgba(5, 2, 11, 0)' }, { backgroundColor: 'rgba(5, 2, 11, 1)' }],
+            opts
+        );
+        const grow = frame.animate([
+            { transform: 'scale(0.55)', borderRadius: '32px', opacity: 0.2 },
+            { transform: 'scale(1)', borderRadius: '0px', opacity: 1 }
+        ], opts);
+        this.obsFsOpening = grow.finished.catch(() => { });
+    }
+
+    async closeObsFullscreen(animate = true) {
+        const layer = document.getElementById('obsFullscreen');
+        const frame = document.getElementById('obsFsFrame');
+        if (!layer.classList.contains('open')) return;
+
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (animate && !reduceMotion && frame.animate) {
+            const opts = { duration: 260, easing: 'ease-in', fill: 'forwards' };
+            const fade = layer.animate(
+                [{ backgroundColor: 'rgba(5, 2, 11, 1)' }, { backgroundColor: 'rgba(5, 2, 11, 0)' }],
+                opts
+            );
+            const shrink = frame.animate([
+                { transform: 'scale(1)', borderRadius: '0px', opacity: 1 },
+                { transform: 'scale(0.55)', borderRadius: '32px', opacity: 0 }
+            ], opts);
+            await shrink.finished.catch(() => { });
+            layer.classList.remove('open');
+            fade.cancel();
+            shrink.cancel();
+        } else {
+            layer.classList.remove('open');
+        }
+        layer.setAttribute('aria-hidden', 'true');
+    }
+
+    // Exit button on the full-screen stage
+    async exitObservation() {
+        this.obsLoadToken++; // cancel any scene that is still loading
+        clearTimeout(this.obsRevealTimer);
+        this.obsRevealTimer = null;
+        this.pauseTimer();
+        await this.closeObsFullscreen(true);
+        this.slideTo(0);
+    }
+
+    // Loads `src` into the visible <img> and resolves true once it has fully
+    // loaded (false on error/timeout). The card is hidden or flipped while this
+    // runs, so the player never sees a half-loaded image.
+    loadSceneImage(image, src, timeoutMs = 15000) {
+        return new Promise(resolve => {
+            let finished = false;
+            let timeoutId = null;
+            const finish = ok => {
+                if (finished) return;
+                finished = true;
+                clearTimeout(timeoutId);
+                image.onload = image.onerror = null;
+                resolve(ok);
+            };
+            timeoutId = setTimeout(() => finish(false), timeoutMs);
+            image.onload = () => finish(true);
+            image.onerror = () => finish(false);
+            image.src = src;
+            if (image.complete && image.naturalWidth > 0) finish(true);
+        });
     }
 
     async loadObservationQuestions(scene) {
@@ -523,30 +643,56 @@ class GaneshaQuestApp {
     }
 
     async showNextObservationScene() {
+        const token = ++this.obsLoadToken;
         const scene = this.obsScenes[this.obsSceneIndex];
         const revealSeconds = 6;
         const card = document.getElementById('obsMemoryCard');
         const cardInner = document.getElementById('obsMemoryCardInner');
         const image = document.getElementById('obsSceneImage');
-        const questions = await this.loadObservationQuestions(scene);
-        const question = questions[Math.floor(Math.random() * questions.length)];
         const progressBar = document.getElementById('obsProgressBar');
+
+        // Freeze every clock until the image is actually on screen
+        this.pauseTimer();
+        clearTimeout(this.obsRevealTimer);
+        this.obsRevealTimer = null;
+        this.obsQuestionLocked = true;
+
+        document.getElementById('obsSceneCounter').textContent = `Scene ${this.obsSceneIndex + 1} of ${this.obsScenes.length}`;
+        document.getElementById('obsRevealLabel').textContent = 'Loading scene…';
+        progressBar.style.transitionDuration = '0s';
+        progressBar.style.width = '100%';
+
+        // Wait for the question file AND the image to finish loading
+        const [questions, imageLoaded] = await Promise.all([
+            this.loadObservationQuestions(scene),
+            this.loadSceneImage(image, scene.image)
+        ]);
+        if (token !== this.obsLoadToken) return; // a newer load took over
+
+        if (!imageLoaded) {
+            // Don't make the player lose time on an image they can't see
+            console.warn(`Could not load scene image, skipping: ${scene.image}`);
+            this.obsSceneIndex++;
+            if (this.obsSceneIndex >= this.obsScenes.length) {
+                this.handleLevelComplete();
+            } else {
+                this.showNextObservationScene();
+            }
+            return;
+        }
+
+        const question = questions[Math.floor(Math.random() * questions.length)];
+        const wasFlipped = card.classList.contains('flipped');
 
         card.classList.remove('flipped');
         cardInner.style.transform = '';
-        image.src = scene.image;
-        document.getElementById('obsSceneCounter').textContent = `Scene ${this.obsSceneIndex + 1} of ${this.obsScenes.length}`;
+        image.classList.remove('is-loading');
+        const backdrop = document.getElementById('obsSceneBackdrop');
+        backdrop.style.backgroundImage = `url("${scene.image}")`;
+        backdrop.classList.add('ready');
         document.getElementById('obsRevealLabel').textContent = 'Memorize this scene';
         document.getElementById('quizQuestionText').textContent = question.text;
 
-        progressBar.style.transitionDuration = '0s';
-        progressBar.style.width = '100%';
-        setTimeout(() => {
-            progressBar.style.transitionDuration = revealSeconds + 's';
-            progressBar.style.width = '0%';
-        }, 50);
-
-        this.obsQuestionLocked = true;
         const optionsGrid = document.getElementById('quizOptionsGrid');
         optionsGrid.innerHTML = '';
         if (question.type === 'text') {
@@ -585,6 +731,22 @@ class GaneshaQuestApp {
                 optionsGrid.appendChild(btn);
             });
         }
+
+        // Let the flip-back animation finish so the image is fully visible
+        if (wasFlipped) await new Promise(resolve => setTimeout(resolve, 800));
+        // ...and let the full-screen "maximise" animation finish
+        await this.obsFsOpening;
+        if (token !== this.obsLoadToken) return;
+
+        // Image is loaded and visible: NOW start the game timer,
+        // the progress bar and the 6-second memorise countdown.
+        this.resumeTimer();
+        progressBar.style.transitionDuration = '0s';
+        progressBar.style.width = '100%';
+        setTimeout(() => {
+            progressBar.style.transitionDuration = revealSeconds + 's';
+            progressBar.style.width = '0%';
+        }, 50);
 
         clearTimeout(this.obsRevealTimer);
         this.obsRevealTimer = setTimeout(() => {
@@ -634,6 +796,16 @@ class GaneshaQuestApp {
         clearInterval(this.timer);
         this.timeLeft = seconds;
         this.updateTimerDisplay();
+        this.resumeTimer();
+    }
+
+    pauseTimer() {
+        clearInterval(this.timer);
+        this.timer = null;
+    }
+
+    resumeTimer() {
+        clearInterval(this.timer);
         this.timer = setInterval(() => {
             this.timeLeft--;
             this.updateTimerDisplay();
@@ -649,10 +821,13 @@ class GaneshaQuestApp {
         const m = Math.floor(this.timeLeft / 60).toString().padStart(2, '0');
         const s = (this.timeLeft % 60).toString().padStart(2, '0');
         document.getElementById('hudTimer').textContent = `${m}:${s}`;
+        const fsTimer = document.getElementById('fsTimer');
+        if (fsTimer) fsTimer.textContent = `${m}:${s}`;
     }
 
     handleLevelComplete() {
         clearInterval(this.timer);
+        this.closeObsFullscreen(false);
         sounds.playVictory();
         if (particlesInstance) particlesInstance.triggerConfetti();
 
@@ -668,6 +843,7 @@ class GaneshaQuestApp {
 
     handleGameOver() {
         clearInterval(this.timer);
+        this.closeObsFullscreen(false);
         document.getElementById('victoryTitle').textContent = 'Quest Complete';
         document.getElementById('victorySubtitle').textContent = 'May Bappa bless you with even greater focus next time!';
         document.getElementById('vicFinalScore').textContent = this.score.toLocaleString();
@@ -778,4 +954,3 @@ let gameApp;
 window.addEventListener('DOMContentLoaded', () => {
     gameApp = new GaneshaQuestApp();
 });
-

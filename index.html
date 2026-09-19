@@ -278,43 +278,11 @@
             </header>
 
             <!-- Gameplay Container Area -->
-            <main class="w-full max-w-5xl mx-auto my-auto py-3">
+            <main id="gameMain" class="w-full max-w-5xl mx-auto my-auto py-3">
 
-                <!-- OBSERVATION QUEST BOARD -->
-                <div id="obsBoardContainer" class="hidden flex-col gap-4 text-center">
-                    <div id="obsHeader" class="space-y-1">
-                        <h3 id="obsPhaseTitle" class="font-serif text-xl font-bold text-gold-300">Observe the Divine
-                            Scene</h3>
-                        <p id="obsPhaseDesc" class="text-xs text-amber-200/70">Study the image for 6 seconds, then
-                            answer one question about it.</p>
-                        <div
-                            class="w-full max-w-md mx-auto bg-slate-900 rounded-full h-2 mt-2 overflow-hidden border border-gold-500/30">
-                            <div id="obsProgressBar"
-                                class="bg-gradient-to-r from-saffron-500 to-gold-400 h-full w-full transition-all duration-1000 linear">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="obsMemoryCard" class="obs-memory-card perspective-1000">
-                        <div id="obsMemoryCardInner" class="obs-memory-card-inner">
-                            <div class="obs-memory-card-face obs-memory-card-front glass-panel">
-                                <img id="obsSceneImage" class="obs-scene-image" alt="Observation scene">
-                                <div class="obs-card-caption">
-                                    <span id="obsSceneCounter">Scene 1 of 7</span>
-                                    <span id="obsRevealLabel">Memorize this scene</span>
-                                </div>
-                            </div>
-                            <div class="obs-memory-card-face obs-memory-card-back glass-panel">
-                                <span class="text-4xl mx-auto">❓</span>
-                                <span class="text-[10px] uppercase tracking-[0.2em] text-amber-300">Scene recalled</span>
-                                <div id="obsQuizStage" class="flex w-full flex-col gap-4">
-                                    <h4 id="quizQuestionText" class="font-serif text-base font-bold text-gold-200">What did you notice?</h4>
-                                    <div id="quizOptionsGrid" class="grid grid-cols-2 gap-3 pt-2"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- OBSERVATION QUEST BOARD
+                     (now rendered in the full-screen stage #obsFullscreen at the bottom of <body>) -->
+                <div id="obsBoardContainer" class="hidden"></div>
 
                 <!-- CARD MATCH GAME BOARD -->
                 <div id="matchBoardContainer" class="flex flex-col gap-4">
@@ -393,6 +361,75 @@
             </footer>
         </section>
 
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- OBSERVATION QUEST: FULL-SCREEN STAGE                          -->
+    <!-- Lives outside #viewportSlider on purpose: the slider is moved  -->
+    <!-- with a CSS transform, which would break position:fixed inside -->
+    <!-- it and stop the image from covering the whole screen.          -->
+    <!-- ============================================================ -->
+    <div id="obsFullscreen" class="obs-fs" aria-hidden="true">
+        <div id="obsFsFrame" class="obs-fs-frame">
+
+            <div id="obsMemoryCard" class="obs-memory-card perspective-1000">
+                <div id="obsMemoryCardInner" class="obs-memory-card-inner">
+
+                    <!-- FRONT: the scene to memorise -->
+                    <div class="obs-memory-card-face obs-memory-card-front">
+                        <div id="obsSceneBackdrop" class="obs-scene-backdrop"></div>
+                        <img id="obsSceneImage" class="obs-scene-image is-loading" alt="Observation scene">
+                        <div class="obs-card-caption">
+                            <span id="obsSceneCounter">Scene 1 of 7</span>
+                            <span id="obsRevealLabel">Loading scene…</span>
+                        </div>
+                    </div>
+
+                    <!-- BACK: the question -->
+                    <div class="obs-memory-card-face obs-memory-card-back">
+                        <span class="text-4xl mx-auto">❓</span>
+                        <span class="text-[10px] uppercase tracking-[0.2em] text-amber-300">Scene recalled</span>
+                        <div id="obsQuizStage" class="flex w-full flex-col gap-4 text-center">
+                            <h4 id="quizQuestionText" class="font-serif text-xl sm:text-2xl font-bold text-gold-200">What did you notice?</h4>
+                            <div id="quizOptionsGrid" class="grid grid-cols-2 gap-3 pt-2"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Memorise countdown (thin bar along the top edge) -->
+            <div class="obs-fs-progress">
+                <div id="obsProgressBar"></div>
+            </div>
+
+            <!-- Floating HUD (mirrors the normal HUD, which is hidden behind this stage) -->
+            <div class="obs-fs-hud">
+                <button type="button" onclick="gameApp.exitObservation()"
+                    class="px-3 py-1.5 rounded-xl glass-card text-amber-300 font-bold text-xs">
+                    🏠 Exit
+                </button>
+                <div class="glass-card rounded-2xl px-4 py-2 flex items-center gap-4 sm:gap-6 text-xs sm:text-sm font-bold">
+                    <div>
+                        <span class="text-amber-200/60 uppercase text-[10px] block">Lives</span>
+                        <span id="fsLives" class="text-red-400 text-base">❤️ ❤️ ❤️</span>
+                    </div>
+                    <div>
+                        <span class="text-amber-200/60 uppercase text-[10px] block">Score</span>
+                        <span id="fsScore" class="font-serif text-gold-400 text-lg">0</span>
+                    </div>
+                    <div>
+                        <span class="text-amber-200/60 uppercase text-[10px] block">Combo</span>
+                        <span id="fsCombo" class="text-saffron-400 text-base">🔥 1x</span>
+                    </div>
+                    <div>
+                        <span class="text-amber-200/60 uppercase text-[10px] block">Time</span>
+                        <span id="fsTimer" class="font-mono text-amber-200 text-base">05:00</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <!-- VICTORY & GAME OVER MODAL -->

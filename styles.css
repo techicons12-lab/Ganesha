@@ -1,4 +1,4 @@
-        @keyframes pulseGlow {
+@keyframes pulseGlow {
 
             0%,
             100% {
@@ -100,16 +100,38 @@
             transform: rotateY(180deg);
         }
 
+        /* ============================================================
+           Observation Quest: full-screen stage
+           (a body-level overlay, so it always covers the real viewport)
+           ============================================================ */
+        .obs-fs {
+            position: fixed;
+            inset: 0;
+            z-index: 40;
+            display: none;
+            background-color: #05020b;
+        }
+
+        .obs-fs.open {
+            display: block;
+        }
+
+        .obs-fs-frame {
+            position: absolute;
+            inset: 0;
+            overflow: hidden;
+            background: #05020b;
+            transform-origin: center center;
+        }
+
         .obs-memory-card {
-            width: min(100%, 760px);
-            height: clamp(300px, 52vh, 520px);
-            margin: 0 auto;
+            position: absolute;
+            inset: 0;
         }
 
         .obs-memory-card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
+            position: absolute;
+            inset: 0;
             transition: transform 0.8s cubic-bezier(0.4, 0.2, 0.2, 1);
             transform-style: preserve-3d;
         }
@@ -125,21 +147,22 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            border-radius: 1.25rem;
             backface-visibility: hidden;
             -webkit-backface-visibility: hidden;
         }
 
         .obs-memory-card-front {
-            padding: 0.5rem;
-            background: rgba(8, 4, 14, 0.96);
+            background: #05020b;
             pointer-events: auto;
         }
 
         .obs-memory-card-back {
+            flex-direction: column;
+            gap: 0.75rem;
+            /* top padding keeps the question clear of the floating HUD */
+            padding: 5.5rem clamp(1rem, 4vw, 2rem) 2rem;
             transform: rotateY(180deg);
-            padding: clamp(1rem, 4vw, 2rem);
-            background: linear-gradient(145deg, rgba(80, 15, 28, 0.96), rgba(20, 8, 25, 0.98));
+            background: linear-gradient(145deg, rgba(80, 15, 28, 0.98), rgba(20, 8, 25, 1));
             pointer-events: none;
         }
 
@@ -151,11 +174,33 @@
             pointer-events: auto;
         }
 
+        /* Blurred copy of the scene fills the letterbox around the image */
+        .obs-scene-backdrop {
+            position: absolute;
+            inset: -40px;
+            background-size: cover;
+            background-position: center;
+            filter: blur(28px) brightness(0.45) saturate(1.2);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .obs-scene-backdrop.ready {
+            opacity: 1;
+        }
+
+        /* The whole scene, scaled to fit the full screen (never cropped) */
         .obs-scene-image {
+            position: relative;
             width: 100%;
             height: 100%;
             object-fit: contain;
-            border-radius: 1rem;
+            transition: opacity 0.3s ease;
+        }
+
+        /* Hidden until the scene image has finished loading */
+        .obs-scene-image.is-loading {
+            opacity: 0;
         }
 
         .obs-card-caption {
@@ -169,8 +214,50 @@
             border-radius: 0.75rem;
             background: rgba(15, 7, 26, 0.78);
             color: #fff3bf;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 700;
+        }
+
+        #obsQuizStage {
+            max-width: 36rem;
+        }
+
+        .obs-fs-hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 5;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            padding: 0.9rem 1rem 1.5rem;
+            background: linear-gradient(to bottom, rgba(5, 2, 11, 0.85), rgba(5, 2, 11, 0));
+            pointer-events: none;
+        }
+
+        .obs-fs-hud > * {
+            pointer-events: auto;
+        }
+
+        .obs-fs-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            z-index: 6;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        #obsProgressBar {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, #FF9933, #FFD700);
+            transition-property: width;
+            transition-timing-function: linear;
         }
 
         /* Custom Scrollbar */
